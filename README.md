@@ -2,7 +2,9 @@
 
 ### To run your project, navigate to the directory and run one of the following npm commands: 
 
-#### `npm start` # you can open iOS, Android, or web from here, or run 
+#### `npm install` # install project dependencies
+
+#### `npm start` # you can open iOS, Android, or web from here 
 
 #### `npm run android`
 
