@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { TextInputMask } from 'react-native-masked-text'
+import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker'
 import api from '../../services/api';
 
@@ -72,7 +73,13 @@ export default function OrphanageData() {
     }
 
     const { uri: image } = result
+
     setImages([...images, image])
+  }
+
+  function handleDeletImage(index: number) {
+    images.splice(index, 1)
+    setImages([...images])
   }
 
   return (
@@ -94,7 +101,7 @@ export default function OrphanageData() {
         multiline
       />
 
-      <Text style={styles.label}>Whatsapp</Text>
+      <Text style={styles.label}>Número de Whatsapp</Text>
       <TextInputMask
         style={styles.input}
         keyboardType="numeric"
@@ -110,17 +117,38 @@ export default function OrphanageData() {
 
       <Text style={styles.label}>Fotos</Text>
 
-      <View style={styles.uploadedImageContainer}>
-        {images.map(image => {
+      <View style={styles.imageContainer}>
+        {images.map((image, index) => {
           return (
-            <Image
+            <LinearGradient
               key={image}
-              source={{ uri: image }}
-              style={styles.uploadedImage}
-            />
+              colors={['#FFC2D8', '#A1E9C5']}
+              start={{ x: 1, y: 0.5 }}
+              end={{ x: 0.4, y: 0.5 }}
+              style={styles.uploadedImageContainerStroke}
+            >
+              <LinearGradient
+                colors={['#FCF0F4', '#EDFFF6']}
+                start={{ x: 1, y: 0.5 }}
+                end={{ x: 0.4, y: 0.5 }}
+                style={styles.uploadedImageContainer}
+              >
+                <Image
+
+                  source={{ uri: image }}
+                  style={styles.uploadedImage}
+                />
+                <Text style={styles.imageName}>
+                  {image.split('/')[9].split('-')[4]}
+                </Text>
+                <TouchableOpacity style={styles.imagesDelete} onPress={() => handleDeletImage(index)}>
+                  <Feather name="x" size={24} color="#FF669D" />
+                </TouchableOpacity>
+              </LinearGradient>
+            </LinearGradient>
+
           )
         })}
-
       </View>
 
       <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
@@ -199,16 +227,35 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 
+  imageContainer: {
+    flexDirection: 'column',
+    borderRadius: 10,
+  },
+
+  uploadedImageContainerStroke: {
+    height: 72,
+    paddingTop: 16,
+    paddingHorizontal: 1,
+    borderRadius: 20,
+    marginBottom: 16,
+    justifyContent: 'center'
+  },
+
   uploadedImageContainer: {
-    flexDirection: 'row'
+    position: 'relative',
+    flexDirection: 'row',
+    marginBottom: 16,
+    height: 70,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    borderRadius: 19
   },
 
   uploadedImage: {
     width: 64,
     height: 64,
-    borderRadius: 20,
-    marginBottom: 32,
-    marginRight: 8
+    borderRadius: 16,
   },
 
   imagesInput: {
@@ -221,6 +268,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 32,
+  },
+
+  imagesDelete: {
+    padding: 24,
+    position: "absolute",
+    right: 0,
+  },
+
+  imageName: {
+    marginLeft: 20,
+    color: '#37C77F'
   },
 
   switchContainer: {
