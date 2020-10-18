@@ -3,6 +3,7 @@ import { ScrollView, View, StyleSheet, Switch, Text, TextInput, TouchableOpacity
 import { Feather } from '@expo/vector-icons';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { TextInputMask } from 'react-native-masked-text'
 import * as ImagePicker from 'expo-image-picker'
 import api from '../../services/api';
 
@@ -16,6 +17,7 @@ interface OrphanageDataRouteParams {
 export default function OrphanageData() {
   const [name, setName] = useState('')
   const [about, setAbout] = useState('')
+  const [contact_number, setContactNumber] = useState('')
   const [instructions, setInstruction] = useState('')
   const [opening_hours, setOpeningHours] = useState('')
   const [open_on_weekends, setOpenOnWeekends] = useState(true)
@@ -24,19 +26,9 @@ export default function OrphanageData() {
   const navigation = useNavigation()
   const route = useRoute()
   const params = route.params as OrphanageDataRouteParams
-  
+
   async function handleCreateOrphanage() {
     const { latitude, longitude } = params.position
-
-    console.log({
-      name,
-      latitude,
-      longitude,
-      about,
-      instructions,
-      opening_hours,
-      open_on_weekends
-    })
 
     const data = new FormData()
 
@@ -44,6 +36,7 @@ export default function OrphanageData() {
     data.append('latitude', String(latitude))
     data.append('longitude', String(longitude))
     data.append('about', about)
+    data.append('contact_number', contact_number)
     data.append('instructions', instructions)
     data.append('opening_hours', opening_hours)
     data.append('open_on_weekends', String(open_on_weekends))
@@ -58,7 +51,6 @@ export default function OrphanageData() {
     await api.post('orphanages', data)
 
     navigation.navigate('OrphanagesMap')
-
   }
 
   async function handleSelectImages() {
@@ -102,10 +94,19 @@ export default function OrphanageData() {
         multiline
       />
 
-      {/*<Text style={styles.label}>Whatsapp</Text>
-      <TextInput
+      <Text style={styles.label}>Whatsapp</Text>
+      <TextInputMask
         style={styles.input}
-      />*/}
+        keyboardType="numeric"
+        type={'custom'}
+        options={{
+          mask: '+55 (99) 99999-9999',
+        }}
+        value={contact_number}
+        onChangeText={(text) => {
+          setContactNumber(text.replace(/\D+/g, ''))
+        }}
+      />
 
       <Text style={styles.label}>Fotos</Text>
 
@@ -114,7 +115,7 @@ export default function OrphanageData() {
           return (
             <Image
               key={image}
-              source={{ uri: image}}
+              source={{ uri: image }}
               style={styles.uploadedImage}
             />
           )
@@ -145,8 +146,8 @@ export default function OrphanageData() {
 
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Atende final de semana?</Text>
-        <Switch 
-          thumbColor="#fff" 
+        <Switch
+          thumbColor="#fff"
           trackColor={{ false: '#ccc', true: '#39CC83' }}
           value={open_on_weekends}
           onValueChange={setOpenOnWeekends}
